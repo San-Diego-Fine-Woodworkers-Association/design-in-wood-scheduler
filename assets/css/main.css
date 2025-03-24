@@ -1,0 +1,85 @@
+@import "tailwindcss" theme(static);
+@import "@nuxt/ui";
+
+@tailwind utilities;
+
+html, body, #__nuxt {
+	height: 100%;
+}
+
+@theme static {
+  --font-sans: "Quicksand", sans-serif;
+	--font-serif: "Cardo", Franklin Gothic, serif;
+	
+	--color-blue-ribbon-50: #edf8ff;
+	--color-blue-ribbon-100: #d6edff;
+	--color-blue-ribbon-200: #b5e1ff;
+	--color-blue-ribbon-300: #83d0ff;
+	--color-blue-ribbon-400: #48b5ff;
+	--color-blue-ribbon-500: #1e91ff;
+	--color-blue-ribbon-600: #0671ff;
+	--color-blue-ribbon-700: #005cff;
+	--color-blue-ribbon-800: #0847c5;
+	--color-blue-ribbon-900: #0d409b;
+	--color-blue-ribbon-950: #0e285d;
+
+	--color-paris-daisy-50: #fefde8;
+	--color-paris-daisy-100: #fffbc2;
+	--color-paris-daisy-200: #fff275;
+	--color-paris-daisy-300: #ffe645;
+	--color-paris-daisy-400: #fcd313;
+	--color-paris-daisy-500: #ecba06;
+	--color-paris-daisy-600: #cc9002;
+	--color-paris-daisy-700: #a26606;
+	--color-paris-daisy-800: #86500d;
+	--color-paris-daisy-900: #724211;
+	--color-paris-daisy-950: #432205;
+
+	--color-sushi-50: #f6faeb;
+	--color-sushi-100: #eaf3d4;
+	--color-sushi-200: #d6e7af;
+	--color-sushi-300: #bad77f;
+	--color-sushi-400: #9fc457;
+	--color-sushi-500: #89b43d;
+	--color-sushi-600: #63862a;
+	--color-sushi-700: #4c6724;
+	--color-sushi-800: #3f5321;
+	--color-sushi-900: #364720;
+	--color-sushi-950: #1b260d;
+
+	--color-shark-50: #f8f7f7;
+	--color-shark-100: #f0eeee;
+	--color-shark-200: #ded9d9;
+	--color-shark-300: #c1b8b9;
+	--color-shark-400: #9f9193;
+	--color-shark-500: #847375;
+	--color-shark-600: #6c5d5e;
+	--color-shark-700: #584c4d;
+	--color-shark-800: #4b4141;
+	--color-shark-900: #413939;
+	--color-shark-950: #242020;
+
+	--color-early-dawn-50: #fff9e8;
+	--color-early-dawn-100: #fef0c7;
+	--color-early-dawn-200: #fddf8a;
+	--color-early-dawn-300: #fcc84d;
+	--color-early-dawn-400: #fbb224;
+	--color-early-dawn-500: #f5900b;
+	--color-early-dawn-600: #d96a06;
+	--color-early-dawn-700: #b44909;
+	--color-early-dawn-800: #92380e;
+	--color-early-dawn-900: #782f0f;
+	--color-early-dawn-950: #451603;
+
+	--color-crimson-50: #fff0f2;
+	--color-crimson-100: #ffe3e5;
+	--color-crimson-200: #ffcbd2;
+	--color-crimson-300: #ffa1ad;
+	--color-crimson-400: #ff6c81;
+	--color-crimson-500: #fb3859;
+	--color-crimson-600: #e01541;
+	--color-crimson-700: #c40c39;
+	--color-crimson-800: #a40d37;
+	--color-crimson-900: #8c0f35;
+	--color-crimson-950: #4f0218;
+}
