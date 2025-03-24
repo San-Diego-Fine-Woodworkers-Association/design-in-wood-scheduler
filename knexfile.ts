@@ -1,11 +1,11 @@
 import type { Knex } from 'knex'
 
-const { DATABASE_URL } = process.env
+const { POSTGRES_URL } = process.env
 
 const config: { [key: string]: Knex.Config } = {
   development: {
     client: 'pg',
-    connection: DATABASE_URL,
+    connection: POSTGRES_URL,
     pool: { min: 1, max: 10 },
     migrations: {
       tableName: 'knex_migrations'
@@ -17,7 +17,7 @@ const config: { [key: string]: Knex.Config } = {
 
   production: {
     client: 'pg',
-    connection: DATABASE_URL,
+    connection: POSTGRES_URL,
     migrations: {
       tableName: 'knex_migrations'
     }
