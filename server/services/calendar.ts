@@ -56,7 +56,7 @@ type DatesAndSlotsRow = Partial<TimeSlotRow> & {
   dateID: number
 }
 
-export const getFairDates = async (memberID?: number): Promise<FairDate[]> => {
+export const getFairDates = async (contactID?: number): Promise<FairDate[]> => {
   const timeSlotVolunteerCount = db.select('time_slot_id', 'date_id')
     .count({ volunteer_count: '*' })
     .from('registrations')
@@ -64,7 +64,7 @@ export const getFairDates = async (memberID?: number): Promise<FairDate[]> => {
 
   const membersRegistrations = db.select('id', 'time_slot_id', 'date_id')
     .from('registrations')
-    .where(memberID ? { member_id: memberID } : false)
+    .where(contactID ? { contact_id: contactID } : false)
 
   const datesAndSlots: DatesAndSlotsRow[] = await db.select({
     dateID: 'd.id',
@@ -135,8 +135,8 @@ export const getFairDates = async (memberID?: number): Promise<FairDate[]> => {
   return orderBy(values(fairDates), 'date', 'asc')
 }
 
-export const getCalendar = async (memberID?: number): Promise<CalendarMonth[]> => {
-  const fairDates = await getFairDates(memberID)
+export const getCalendar = async (contactID?: number): Promise<CalendarMonth[]> => {
+  const fairDates = await getFairDates(contactID)
 
   const firstDay = first(fairDates)!
   const lastDay = last(fairDates)!

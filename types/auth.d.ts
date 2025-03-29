@@ -1,14 +1,14 @@
 declare module '#auth-utils' {
   interface User {
     email: string
-    memberID: number
+    contactID: number
     isAdmin: boolean
     address: {
-      street1?: string
-      street2?: string
-      city?: string
-      state?: string
-      postalCode?: string
+      street1: string
+      street2?: string | null
+      city: string
+      state: string
+      postalCode: string
     }
   }
 }

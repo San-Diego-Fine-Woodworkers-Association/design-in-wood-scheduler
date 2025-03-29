@@ -1,16 +1,14 @@
 import { z } from 'zod'
-import { toNumber } from 'lodash-es'
 import { login } from '../services/user'
 
 const bodySchema = z.object({
-  email: z.string().email(),
-  memberID: z.string()
+  email: z.string().email()
 })
 
 export default defineEventHandler(async (event) => {
-  const { email, memberID } = await readValidatedBody(event, bodySchema.parse)
+  const { email } = await readValidatedBody(event, bodySchema.parse)
 
-  const user = await login(email, toNumber(memberID))
+  const user = await login(email)
 
   if (user) {
     await setUserSession(event, { user })

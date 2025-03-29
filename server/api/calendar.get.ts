@@ -11,7 +11,7 @@ export type GetCalendarResponse = {
 export default defineEventHandler(async (event) => {
   const { user } = await getUserSession(event)
 
-  const months = await getCalendar(user?.memberID)
+  const months = await getCalendar(user?.contactID)
 
   const data = {
     months,

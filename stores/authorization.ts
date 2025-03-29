@@ -22,6 +22,7 @@ export const useAuthorizationStore = defineStore('authorizationStore', {
 
     resolvePendingLogin(res: boolean | undefined) {
       if (this.loginResolver) this.loginResolver(res)
+      this.showLogin = false
     }
   }
 })
