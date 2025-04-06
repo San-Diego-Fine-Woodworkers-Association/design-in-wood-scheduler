@@ -8,7 +8,7 @@
       <div
         class="pl-5"
       >
-        {{ formatDate(calendarStore.firstDate?.date!) }} - {{ formatDate(calendarStore.lastDate?.date!) }}
+        {{ formatDate(calendarStore.firstDate!) }} - {{ formatDate(calendarStore.lastDate!) }}
       </div>
     </div>
 
@@ -27,9 +27,14 @@ const calendarStore = useCalendarStore()
 const menu = ref([
   [
     {
-      label: 'Calendar',
+      label: 'Sign Up',
       to: '/calendar',
       icon: 'i-lucide-calendar-search'
+    },
+    {
+      label: 'My Registrations',
+      to: '/my-registrations',
+      icon: 'i-lucide-calendar-check'
     }
   ]
 ])

@@ -34,7 +34,7 @@
 
         <div
           v-for="calendarDate in dates"
-          :key="calendarDate.id"
+          :key="calendarDate.date.getTime()"
           :class="[$style['calendar-cell'], $style.day, 'bg-white']"
         >
           <RegistrationCalendarCell
@@ -52,19 +52,19 @@
 <script setup lang="ts">
 import { eachDayOfInterval, endOfWeek, format, getDay, startOfWeek } from 'date-fns'
 import { first, map } from 'lodash-es'
-import type { PropType } from 'vue'
 
-import type { Registration } from './calendar'
-import type { CalendarDate, CalendarMonth } from '~/server/services/calendar'
+import type { PropType } from 'vue'
+import type { RegisterEvent, CancelRegistrationEvent } from './CalendarCell.vue'
+import type { Calendar, Day } from '~/types/calendar'
 
 const emit = defineEmits<{
-  register: [registration: Registration]
-  cancel: [registration: Registration]
+  register: [registration: RegisterEvent]
+  cancel: [registration: CancelRegistrationEvent]
 }>()
 const props = defineProps({
   calendar: {
     required: true,
-    type: Object as PropType<CalendarMonth[]>
+    type: Object as PropType<Calendar>
   },
   isLoading: {
     required: true,
@@ -74,15 +74,15 @@ const props = defineProps({
 
 const daysOfWeek = map(eachDayOfInterval({ start: startOfWeek(new Date()), end: endOfWeek(new Date()) }), date => format(date, 'EEE'))
 
-function getCellOffset(dates: CalendarDate[]): number {
+function getCellOffset(dates: Day[]): number {
   return getDay(first(dates)!.date)
 }
 
-function onRegister(registration: Registration) {
+function onRegister(registration: RegisterEvent) {
   emit('register', registration)
 }
 
-function onCancel(registration: Registration) {
+function onCancel(registration: CancelRegistrationEvent) {
   emit('cancel', registration)
 }
 </script>
@@ -131,7 +131,6 @@ function onCancel(registration: Registration) {
 }
 
 .day {
-  padding: 8px;
   min-height: 100px;
 }
 </style>

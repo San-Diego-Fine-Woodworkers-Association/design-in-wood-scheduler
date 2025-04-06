@@ -40,7 +40,7 @@
 import { format } from 'date-fns'
 
 import { map, toNumber } from 'lodash-es'
-import type { Registration } from './calendar'
+import type { RegisterEvent } from './CalendarCell.vue'
 
 const toast = useToast()
 
@@ -50,7 +50,7 @@ const emit = defineEmits(['close'])
 const props = defineProps({
   registration: {
     default: null,
-    type: Object as PropType<Registration>
+    type: Object as PropType<RegisterEvent>
   }
 })
 

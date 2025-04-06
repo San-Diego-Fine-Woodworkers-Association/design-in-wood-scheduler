@@ -1,31 +1,30 @@
 import { defineStore } from 'pinia'
-import SuperJSON from 'superjson'
 
-import { first, last } from 'lodash-es'
-import type { CalendarMonth } from '~/server/services/calendar'
-import type { GetCalendarResponse } from '~/server/api/calendar.get'
+import { first, last, map } from 'lodash-es'
+import type { Calendar } from '~/types/calendar'
+
+const convertCalendarDateStringsToDates = (calendar: Calendar): Calendar => map(calendar, ({ month, dates }) => ({
+  month,
+  dates: map(dates, d => ({ ...d, date: new Date(d.date) }))
+}))
 
 export const useCalendarStore = defineStore('calendarStore', {
   state: () => ({
     isLoading: true,
     isError: false,
     error: null as Error | null,
-    calendar: [] as CalendarMonth[]
+    calendar: [] as Calendar
   }),
 
   getters: {
-    firstDate: state => first(first(state.calendar)?.dates),
-    lastDate: state => last(last(state.calendar)?.dates)
+    firstDate: state => first(first(state.calendar)?.dates)?.date,
+    lastDate: state => last(last(state.calendar)?.dates)?.date
   },
 
   actions: {
     async fetch() {
       this.isLoading = true
-      const { data, error } = await useFetch<GetCalendarResponse>('/api/calendar', {
-        transform: (value) => {
-          return SuperJSON.parse(value as unknown as string)
-        }
-      })
+      const { data, error } = await useFetch<Calendar>('/api/calendar')
 
       if (error.value) {
         console.log('An error occurred in fetching the calendar.', error.value)
@@ -34,7 +33,7 @@ export const useCalendarStore = defineStore('calendarStore', {
         throw error
       }
 
-      this.calendar = data.value?.months || []
+      this.calendar = convertCalendarDateStringsToDates(data.value || [])
       this.isLoading = false
       this.isError = false
       this.error = null

@@ -8,9 +8,10 @@
 </template>
 
 <script setup lang="ts">
-import type { Registration } from '~/components/Registration/calendar'
 import ConfirmAdd from '~/components/Registration/ConfirmAdd.vue'
 import ConfirmCancel from '~/components/Registration/ConfirmCancel.vue'
+
+import type { RegisterEvent, CancelRegistrationEvent } from '~/components/Registration/CalendarCell.vue'
 
 const { isAuthorized } = useAuthorizationStore()
 const calendarStore = useCalendarStore()
@@ -20,7 +21,7 @@ const overlay = useOverlay()
 const confirmAddModal = overlay.create(ConfirmAdd)
 const confirmCancelModal = overlay.create(ConfirmCancel)
 
-async function onRegister(registration: Registration) {
+async function onRegister(registration: RegisterEvent) {
   const allowed = await isAuthorized()
 
   if (!allowed) return
@@ -29,11 +30,11 @@ async function onRegister(registration: Registration) {
   confirmAddModal.open()
 }
 
-async function onCancel(registration: Registration) {
+async function onCancel(cancellation: CancelRegistrationEvent) {
   const allowed = await isAuthorized()
 
   if (!allowed) return
-  confirmCancelModal.patch({ registration })
+  confirmCancelModal.patch({ cancellation })
 
   confirmCancelModal.open()
 }

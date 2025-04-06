@@ -11,7 +11,7 @@ export const login = async (email: string): Promise<User | undefined> => {
   const primaryAddress = find(contact.Addresses || [], ({ IsPrimary }) => IsPrimary)!
   const user: User = {
     email,
-    contactID: contact.ContactId,
+    id: contact.ContactId,
     isAdmin: false,
     address: {
       street1: primaryAddress.StreetAddress1,

@@ -2,11 +2,12 @@
   <UModal
     title="Cancel Registration"
     :dismissible="!isCancelling"
+    @update:open="onOpenUpdate"
   >
     <template #body>
       <div class="flex items-center flex-col w-full">
         <h1 class="font-bold text-2xl">
-          {{ registration?.area.typeName }}
+          {{ cancellation?.area.typeName }}
         </h1>
 
         <div>
@@ -25,8 +26,8 @@
         Close
       </UButton>
       <UButton
+        ref="cancel-button"
         color="error"
-        variant="solid"
         loading-auto
         @click="onCancel"
       >
@@ -40,17 +41,19 @@
 import { format } from 'date-fns'
 
 import { map, toNumber } from 'lodash-es'
-import type { Registration } from './calendar'
+
+import type { CancelRegistrationEvent } from './CalendarCell.vue'
 
 const toast = useToast()
 
 const registrationStore = useRegistrationStore()
 
+const cancelButtonRef = useTemplateRef('cancel-button')
 const emit = defineEmits(['close'])
 const props = defineProps({
-  registration: {
+  cancellation: {
     default: null,
-    type: Object as PropType<Registration>
+    type: Object as PropType<CancelRegistrationEvent>
   }
 })
 
@@ -64,13 +67,13 @@ function formatTime(time: string): string {
 };
 
 const registrationTimeString = computed(() => {
-  if (!props.registration) {
+  if (!props.cancellation) {
     return ''
   }
 
-  const dateString = format(props.registration?.date, 'MM/dd')
-  const start = formatTime(props.registration?.area.time.start)
-  const end = formatTime(props.registration?.area.time.end)
+  const dateString = format(props.cancellation?.date, 'MM/dd')
+  const start = formatTime(props.cancellation?.area.time.start)
+  const end = formatTime(props.cancellation?.area.time.end)
 
   return `${dateString}, ${start} - ${end}`
 })
@@ -78,20 +81,24 @@ const registrationTimeString = computed(() => {
 async function onCancel() {
   isCancelling.value = true
 
-  const regID = props.registration?.area.time.registrationID
+  const regID = props.cancellation?.area.time.registration
   if (!regID) {
     return
   }
 
-  await registrationStore.cancel(regID!)
+  await registrationStore.cancel(regID)
 
   toast.add({
     title: 'Cancelled Registration',
-    description: `Registration for for ${props.registration.area.typeName} on ${registrationTimeString.value} cancelled.`,
+    description: `Registration for for ${props.cancellation.area.typeName} on ${registrationTimeString.value} cancelled.`,
     color: 'success'
   })
 
   isCancelling.value = false
   emit('close', true)
+}
+
+function onOpenUpdate(openStatus: boolean) {
+  if (openStatus) cancelButtonRef.value?.$el.focus()
 }
 </script>

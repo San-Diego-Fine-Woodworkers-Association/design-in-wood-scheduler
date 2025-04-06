@@ -9,9 +9,9 @@ export const useAuthorizationStore = defineStore('authorizationStore', {
 
   actions: {
     async isAuthorized() {
-      const { loggedIn } = useUserSession()
+      const { loggedIn, user } = useUserSession()
 
-      if (loggedIn.value) return true
+      if (loggedIn.value && user.value?.id) return true
       if (this.pendingLogin !== null && this.showLogin) return this.pendingLogin
 
       this.pendingLogin = new Promise(resolve => this.loginResolver = resolve)

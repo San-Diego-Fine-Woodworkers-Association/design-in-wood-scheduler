@@ -1,7 +1,7 @@
 declare module '#auth-utils' {
   interface User {
     email: string
-    contactID: number
+    id: number
     isAdmin: boolean
     address: {
       street1: string

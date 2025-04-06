@@ -1,5 +1,5 @@
-import { eachDayOfInterval } from 'date-fns'
-import { map } from 'lodash-es'
+import { eachDayOfInterval, isMonday, isTuesday } from 'date-fns'
+import { filter, map } from 'lodash-es'
 
 export async function seed(knex) {
   // Deletes ALL existing entries
@@ -15,10 +15,15 @@ export async function seed(knex) {
       { id: 1, type: 'Gallery Floor' },
       { id: 2, type: 'Chair Shop' }
     ]),
-    knex('fair_dates').insert(map(eachDayOfInterval({
-      start: new Date('2025-06-12'),
-      end: new Date('2025-07-12')
-    }), (date, id) => ({ id, date })))
+    knex('fair_dates').insert(
+      filter(
+        map(eachDayOfInterval({
+          start: new Date('2025-06-12'),
+          end: new Date('2025-07-12')
+        }), (date, id) => ({ id, date })),
+        ({ date }) => !isMonday(date) && !isTuesday(date)
+      )
+    )
   ])
 
   await knex('time_slots').insert([

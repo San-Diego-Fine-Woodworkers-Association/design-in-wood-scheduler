@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
-import type { Registration } from '~/components/Registration/calendar'
+import type { RegisterEvent } from '~/components/Registration/CalendarCell.vue'
 
 export const useRegistrationStore = defineStore('registrationStore', {
   actions: {
-    async register(payload: Registration) {
+    async register(payload: RegisterEvent) {
       const calendarStore = useCalendarStore()
 
       await $fetch('/api/registration', { method: 'post', body: payload })

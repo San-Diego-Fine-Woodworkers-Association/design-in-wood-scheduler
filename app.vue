@@ -1,7 +1,8 @@
 <template>
   <UApp
     :toaster="{
-      position: 'top-center'
+      position: 'top-right',
+      expand: false
     }"
   >
     <NuxtLayout>

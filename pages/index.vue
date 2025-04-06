@@ -8,7 +8,7 @@
     </h2>
 
     <div class="mb-10">
-      {{ formatDate(calendarStore.firstDate?.date!) }} - {{ formatDate(calendarStore.lastDate?.date!) }}
+      {{ formatDate(calendarStore.firstDate!) }} - {{ formatDate(calendarStore.lastDate!) }}
     </div>
 
     <div class="flex flex-col">
@@ -18,13 +18,6 @@
         size="xl"
       >
         Sign Up
-      </UButton>
-      <UButton
-        class="mb-2 justify-center bg-white"
-        variant="outline"
-        size="xl"
-      >
-        FAQ
       </UButton>
       <UButton
         class="mb-2 justify-center bg-white"
