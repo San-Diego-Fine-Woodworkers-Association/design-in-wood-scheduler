@@ -6,12 +6,26 @@
   >
     <template #body>
       <div class="flex items-center flex-col w-full">
-        <h1 class="font-bold text-2xl">
+        <h1 class="font-bold text-2xl mb-2">
           {{ cancellation?.area.typeName }}
         </h1>
 
-        <div>
+        <div class="mb-2">
           {{ registrationTimeString }}
+        </div>
+
+        <div
+          v-if="userName"
+          class="mb-2"
+        >
+          {{ userName }}
+        </div>
+
+        <div
+          v-if="userEmail"
+          class="mb-2"
+        >
+          {{ userEmail }}
         </div>
       </div>
     </template>
@@ -40,7 +54,7 @@
 <script setup lang="ts">
 import { format } from 'date-fns'
 
-import { map, toNumber } from 'lodash-es'
+import { filter, get, map, toNumber } from 'lodash-es'
 
 import type { CancelRegistrationEvent } from './CalendarCell.vue'
 
@@ -66,6 +80,10 @@ function formatTime(time: string): string {
   return `${hour}${ampm}`
 };
 
+const registrationUser: Ref<{ id: number, email?: string, name?: string } | undefined> = computed(() => get(props.cancellation, 'registration.user'))
+const userName = computed(() => registrationUser.value?.name)
+const userEmail = computed(() => registrationUser.value?.email)
+
 const registrationTimeString = computed(() => {
   if (!props.cancellation) {
     return ''
@@ -81,16 +99,21 @@ const registrationTimeString = computed(() => {
 async function onCancel() {
   isCancelling.value = true
 
-  const regID = props.cancellation?.area.time.registration
+  const regID: number = get(props.cancellation, 'registration.id', props.cancellation?.registration as number)
   if (!regID) {
     return
   }
 
-  await registrationStore.cancel(regID)
+  if (registrationUser.value) await registrationStore.cancelForUser(regID)
+  else await registrationStore.cancel(regID)
 
   toast.add({
     title: 'Cancelled Registration',
-    description: `Registration for for ${props.cancellation.area.typeName} on ${registrationTimeString.value} cancelled.`,
+    description: filter([
+      `Registration ${props.cancellation.area.typeName} on ${registrationTimeString.value}`,
+      userName.value ? `for ${userName.value}` : null,
+      'cancelled.'
+    ]).join(' '),
     color: 'success'
   })
 

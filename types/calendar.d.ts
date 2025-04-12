@@ -1,16 +1,14 @@
-import type { Area, Registration, RegistrationID } from '~/types/registration'
+import type { Area } from '~/types/registration'
 
-export type Day<T = RegistrationID | Registration> = {
+export type Day = {
   id?: number
   date: Date
-  areas?: Area<T>[]
+  areas?: Area[]
 }
 
-export type Month<T = RegistrationID | Registration> = {
+export type Month = {
   month: string
-  dates: Day<T>[]
+  dates: Day[]
 }
 
-export type Calendar<T = RegistrationID | Registration> = Month<T>[]
-
-export type AdminCalendar = Calendar<Registration>
+export type Calendar = Month[]

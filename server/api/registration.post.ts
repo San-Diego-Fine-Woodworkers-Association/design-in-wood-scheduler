@@ -6,5 +6,5 @@ export default defineEventHandler(async (event) => {
     requireUserSession(event)
   ])
 
-  await create(body, user)
+  await create(body, user.id)
 })

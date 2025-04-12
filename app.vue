@@ -6,6 +6,7 @@
     }"
   >
     <NuxtLayout>
+      <NuxtLoadingIndicator />
       <NuxtPage :page-key="route => route.fullPath" />
     </NuxtLayout>
   </UApp>
@@ -14,10 +15,10 @@
 <script setup lang="ts">
 import LoginForm from '~/components/Login/Form.vue'
 
-const { fetch: fetchCalendar } = useCalendarStore()
 const authorizationStore = useAuthorizationStore()
+const calendarStore = useCalendarStore()
 
-await callOnce(fetchCalendar)
+callOnce(calendarStore.fetch)
 
 const overlay = useOverlay()
 

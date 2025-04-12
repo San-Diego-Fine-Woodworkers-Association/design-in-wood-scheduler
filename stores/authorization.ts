@@ -1,27 +1,28 @@
+import { identity } from 'lodash-es'
 import { defineStore } from 'pinia'
 
 export const useAuthorizationStore = defineStore('authorizationStore', {
   state: () => ({
     showLogin: false,
-    pendingLogin: null as Promise<boolean | undefined> | null,
+    pendingLogin: undefined as Promise<boolean | undefined> | undefined,
     loginResolver: null as ((value: boolean | undefined) => void) | null
   }),
 
   actions: {
-    async isAuthorized() {
+    async isAuthorized(cb: (isAllowed?: boolean) => boolean | undefined = identity): Promise<boolean | undefined> {
       const { loggedIn, user } = useUserSession()
 
-      if (loggedIn.value && user.value?.id) return true
-      if (this.pendingLogin !== null && this.showLogin) return this.pendingLogin
+      if (loggedIn.value && user.value?.id) return cb(true)
+      if (this.pendingLogin !== null && this.showLogin) return this.pendingLogin!.then(cb)
 
       this.pendingLogin = new Promise(resolve => this.loginResolver = resolve)
       this.showLogin = true
 
-      return this.pendingLogin
+      return this.pendingLogin.then(cb || identity)
     },
 
     resolvePendingLogin(res: boolean | undefined) {
-      if (this.loginResolver) this.loginResolver(res)
+      if (this.loginResolver) return this.loginResolver(res)
       this.showLogin = false
     }
   }

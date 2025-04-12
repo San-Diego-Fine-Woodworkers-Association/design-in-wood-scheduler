@@ -4,9 +4,9 @@ import { first, last } from 'lodash-es'
 import type { Calendar } from '~/types/calendar'
 import calendarDatesAsDates from '~/utils/calendar-dates-as-dates'
 
-export const useCalendarStore = defineStore('calendarStore', {
+export const useAdminCalendarStore = defineStore('adminCalendarStore', {
   state: () => ({
-    isLoading: false,
+    isLoading: true,
     isError: false,
     error: null as Error | null,
     calendar: [] as Calendar
@@ -19,22 +19,24 @@ export const useCalendarStore = defineStore('calendarStore', {
 
   actions: {
     async fetch() {
-      this.isLoading = true
+      const userSession = useUserSession()
 
-      const { data, error } = await useFetch<Calendar>('/api/calendar')
+      if (!userSession.user.value?.isAdmin) return this.calendar
+
+      this.isLoading = true
+      const { data, error } = await useFetch<Calendar>('/api/admin/calendar')
 
       if (error.value) {
         console.log('An error occurred in fetching the calendar.', error.value)
-        this.isLoading = false
         this.isError = true
         this.error = error.value
-        throw error.value
+        throw error
       }
 
       this.calendar = calendarDatesAsDates(data.value || [])
+      this.isLoading = false
       this.isError = false
       this.error = null
-      this.isLoading = false
 
       return this.calendar
     }

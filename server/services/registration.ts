@@ -1,32 +1,53 @@
-import { isEmpty, reduce } from 'lodash-es'
+import { isNil, reduce } from 'lodash-es'
 
 import db from '../clients/db'
 
 import type { User } from '#auth-utils'
-import type { Registration } from '~/types/registration'
+import type { RegisterEvent } from '~/components/Registration/CalendarCell.vue'
+import type { Registration, RegistrationDetails } from '~/types/registration'
 
 export async function create(
-  { dateID, area }: Registration, user: User
-): Promise<{ id: number } | undefined> {
-  const existingRegistration = await db.select('id', 'user_id')
-    .from({ r: 'registrations' })
-    .where('r.date_id', dateID)
-    .andWhere('r.time_slot_id', area.time.id)
+  registration: RegisterEvent,
+  userID: User['id']
+): Promise<Registration | undefined> {
+  const [existingRegistration, isSlotFull] = await Promise.all([
+    db.select('id')
+      .from({ r: 'registrations' })
+      .where('r.date_id', registration.dateID)
+      .andWhere('r.time_slot_id', registration.area.time.id)
+      .andWhere('r.user_id', userID)
+      .first(),
 
-  if (!isEmpty(existingRegistration)) {
-    if (existingRegistration[0].user_id === user.id) return
+    db.select({
+      id: 't.id',
+      maxVolunteerCount: 't.volunteer_count',
+      volunteerCount: 'r.count'
+    }).from({ t: 'time_slots' })
+      .leftJoin({
+        r: db.select('time_slot_id').from('registrations').where({
+          date_id: registration.dateID, time_slot_id: registration.area.time.id
+        }).groupBy('time_slot_id').count('time_slot_id', { as: 'count' }) as unknown as string
+      }, 'r.time_slot_id', 't.id')
+      .where('t.id', registration.area.time.id)
+      .first()
+      .then(({ maxVolunteerCount, volunteerCount }) => volunteerCount >= maxVolunteerCount)
+  ])
 
+  if (!isNil(existingRegistration) || isSlotFull) {
     throw createError({ statusCode: 409, statusMessage: 'Conflict' })
   }
 
-  const registration: { id: number } = await db.insert({
-    date_id: dateID,
-    time_slot_id: area.time.id,
-    user_id: user.id
+  const newRegistration: { id: number }[] = await db.insert({
+    date_id: registration.dateID,
+    time_slot_id: registration.area.time.id,
+    user_id: userID
   }).into('registrations')
     .returning('id')
 
-  return registration
+  return {
+    id: newRegistration[0].id,
+    user: { id: userID }
+  }
 }
 
 export async function list(user?: User) {
@@ -49,10 +70,12 @@ export async function list(user?: User) {
 
   const res = await query
 
-  return reduce(res, (acc: Record<number, Registration[]>, { dateID, date, ...rest }) => {
+  return reduce(res, (acc: Record<number, RegistrationDetails[]>, { dateID, date, ...rest }) => {
     const registration = {
       id: rest.id,
-      userID: rest.userID,
+      user: {
+        id: rest.userID
+      },
       date,
       dateID,
       area: {
@@ -77,11 +100,14 @@ export async function list(user?: User) {
   }, {})
 }
 
-export async function cancel(registrationID: number, user: User): Promise<void> {
-  const count = await db('registrations').select('id').where({
-    id: registrationID,
-    user_id: user.id
-  }).del()
+export async function cancel(registrationID: number, userID?: number): Promise<void> {
+  const query = db('registrations').select('id').where({
+    id: registrationID
+  })
+
+  if (userID) query.andWhere('user_id', userID)
+
+  const count = await query.del()
 
   if (count === 0) throw createError({ statusCode: 404, statusMessage: 'Registration not found' })
 };

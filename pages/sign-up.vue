@@ -1,10 +1,12 @@
 <template>
-  <RegistrationCalendar
-    :is-loading="calendarStore.isLoading"
-    :calendar="calendarStore.calendar"
-    @register="onRegister"
-    @cancel="onCancel"
-  />
+  <PageContainer title="Sign-Up">
+    <RegistrationCalendar
+      :is-loading="calendarStore.isLoading"
+      :calendar="calendarStore.calendar"
+      @register="onRegister"
+      @cancel="onCancel"
+    />
+  </PageContainer>
 </template>
 
 <script setup lang="ts">
@@ -15,6 +17,8 @@ import type { RegisterEvent, CancelRegistrationEvent } from '~/components/Regist
 
 const { isAuthorized } = useAuthorizationStore()
 const calendarStore = useCalendarStore()
+
+useAsyncData(() => calendarStore.fetch())
 
 const overlay = useOverlay()
 

@@ -12,6 +12,12 @@
         <div>
           {{ registrationTimeString }}
         </div>
+
+        <AdminUserSearch
+          v-if="registration.search"
+          v-model="selectedUser"
+          class="mt-4 w-[400px]"
+        />
       </div>
     </template>
 
@@ -24,14 +30,21 @@
       >
         Cancel
       </UButton>
-      <UButton
-        color="primary"
-        variant="solid"
-        loading-auto
-        @click="onConfirm"
+
+      <UTooltip
+        :text="confirmLabel!"
+        :disabled="!confirmLabel"
       >
-        Register
-      </UButton>
+        <UButton
+          color="primary"
+          variant="solid"
+          loading-auto
+          :disabled="isConfirmDisabled"
+          @click="onConfirm"
+        >
+          Register
+        </UButton>
+      </UTooltip>
     </template>
   </UModal>
 </template>
@@ -41,6 +54,7 @@ import { format } from 'date-fns'
 
 import { map, toNumber } from 'lodash-es'
 import type { RegisterEvent } from './CalendarCell.vue'
+import type { User } from '#auth-utils'
 
 const toast = useToast()
 
@@ -54,6 +68,9 @@ const props = defineProps({
   }
 })
 
+const selectedUser: Ref<User | undefined> = ref(undefined)
+const isConfirmDisabled = computed(() => props.registration.search && !selectedUser?.value)
+const confirmLabel = computed(() => isConfirmDisabled.value ? 'Must select a user' : null)
 const isRegistering = ref(false)
 
 function formatTime(time: string): string {
@@ -78,7 +95,8 @@ const registrationTimeString = computed(() => {
 async function onConfirm() {
   isRegistering.value = true
 
-  await registrationStore.register(props.registration)
+  if (selectedUser.value) await registrationStore.registerForUser(props.registration, selectedUser.value.id)
+  else await registrationStore.register(props.registration)
 
   toast.add({
     title: 'Registered',

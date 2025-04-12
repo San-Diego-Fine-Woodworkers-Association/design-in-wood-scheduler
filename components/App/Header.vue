@@ -8,14 +8,31 @@
       <div
         class="pl-5"
       >
-        {{ formatDate(calendarStore.firstDate!) }} - {{ formatDate(calendarStore.lastDate!) }}
+        {{ formatDate(calendarStore.firstDate || new Date()) }} - {{ formatDate(calendarStore.lastDate || new Date()) }}
       </div>
     </div>
 
     <UNavigationMenu
       :items="menu"
-      class="justify-self-center"
+      class="justify-self-center z-20"
     />
+
+    <UButton
+      v-if="loggedIn"
+      class="w-[120px] justify-self-end flex flex-row justify-center"
+      loading-auto
+      @click="signOut"
+    >
+      Sign Out
+    </UButton>
+
+    <UButton
+      v-if="!loggedIn"
+      class="w-[120px] justify-self-end flex flex-row justify-center"
+      @click="signIn"
+    >
+      Sign In
+    </UButton>
   </div>
 </template>
 
@@ -23,19 +40,55 @@
 import { format } from 'date-fns'
 
 const calendarStore = useCalendarStore()
+const { isAuthorized } = useAuthorizationStore()
+const { loggedIn, user, clear } = useUserSession()
+const router = useRouter()
 
-const menu = ref([
+async function signOut() {
+  await clear()
+  await calendarStore.fetch()
+}
+
+function signIn() {
+  isAuthorized()
+}
+
+const menu = computed(() => [
   [
     {
       label: 'Sign Up',
-      to: '/calendar',
+      to: '/sign-up',
       icon: 'i-lucide-calendar-search'
     },
     {
       label: 'My Registrations',
       to: '/my-registrations',
       icon: 'i-lucide-calendar-check'
-    }
+    },
+    ...(user.value?.isAdmin
+      ? [{
+          label: 'Admin',
+          icon: 'i-lucide-key-round',
+          active: router.currentRoute.value.path.startsWith('/admin') ? true : false,
+          children: [{
+            label: 'Registrations',
+            to: '/admin/registrations',
+            icon: 'i-lucide-calendar-check'
+          }, {
+            label: 'Fair Dates',
+            to: '/admin/fair-dates',
+            icon: 'i-lucide-calendar-cog'
+          }, {
+            label: 'Time Slots',
+            to: '/admin/time-slots',
+            icon: 'i-lucide-calendar-clock'
+          }, {
+            label: 'Controls',
+            to: '/admin/controls',
+            icon: 'i-lucide-sliders-horizontal'
+          }]
+        }]
+      : [])
   ]
 ])
 

@@ -1,5 +1,5 @@
 <template>
-  <AdminPageContainer title="Fair Dates">
+  <AdminPageContainer title="Controls">
     <h1>Hello</h1>
   </AdminPageContainer>
 </template>

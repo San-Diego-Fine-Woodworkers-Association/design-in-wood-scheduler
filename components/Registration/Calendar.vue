@@ -40,6 +40,7 @@
           <RegistrationCalendarCell
             :day="calendarDate"
             class="h-full"
+            :admin="admin"
             @register="onRegister"
             @cancel="onCancel"
           />
@@ -69,6 +70,10 @@ const props = defineProps({
   isLoading: {
     required: true,
     type: Boolean
+  },
+  admin: {
+    type: Boolean,
+    default: false
   }
 })
 

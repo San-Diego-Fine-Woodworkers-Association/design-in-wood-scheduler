@@ -3,6 +3,7 @@ import { eachDayOfInterval, format } from 'date-fns'
 
 import db from '../clients/db'
 import type { Calendar } from '~/types/calendar'
+import type { Registration, RegistrationID } from '~/types/registration'
 
 type DateRow = { id: number, date: Date }
 function getDates(): Promise<DateRow[]> {
@@ -31,20 +32,17 @@ function getTimeSlots(): Promise<TimeSlotRow[]> {
 }
 
 type RegistrationRow = { id: number, userID: number, timeSlotID: number, dateID: number }
-function getRegistrations(userID?: number): Promise<RegistrationRow[]> {
-  const query = db.select({
+function getRegistrations(): Promise<RegistrationRow[]> {
+  return db.select({
     id: 'r.id',
     userID: 'r.user_id',
     timeSlotID: 'time_slot_id',
     dateID: 'date_id'
   }).from({ r: 'registrations' })
-
-  if (userID) query.where('r.user_id', userID)
-  return query
 }
 
-export async function getCalendar(userID?: number): Promise<Calendar> {
-  const [dates, timeSlots, registrations] = await Promise.all([getDates(), getTimeSlots(), getRegistrations(userID)])
+export async function getCalendar(userID?: number | null): Promise<Calendar> {
+  const [dates, timeSlots, registrations] = await Promise.all([getDates(), getTimeSlots(), getRegistrations()])
 
   const datesByDate = keyBy(dates, ({ date }) => date.getTime())
   const timeSlotsByTypeID = reduce(timeSlots, (acc: {
@@ -61,12 +59,12 @@ export async function getCalendar(userID?: number): Promise<Calendar> {
   const lastDay = last(dates)!.date
   const allDays = eachDayOfInterval({ start: firstDay, end: lastDay })
 
-  const getRegistrationDetails = (dateID: number, timeSlotID: number): { registration: number | undefined } | { registrations: number[] } => userID
+  const getRegistrationDetails = (dateID: number, timeSlotID: number): { registration: RegistrationID | undefined } | { registrations: Registration[] } => userID !== undefined
     ? ({
         registration: find(registrationsByDateAndTimeSlotID[`${dateID}__${timeSlotID}`], ['userID', userID])?.id
       })
     : ({
-        registrations: map(registrationsByDateAndTimeSlotID[`${dateID}__${timeSlotID}`] || [], 'id')
+        registrations: map(registrationsByDateAndTimeSlotID[`${dateID}__${timeSlotID}`] || [], ({ id, userID }) => ({ id, user: { id: userID } }))
       })
 
   const mappedDays = map(allDays, (date) => {

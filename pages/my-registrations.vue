@@ -1,14 +1,13 @@
 <template>
-  <div class="max-w-[700px] mx-auto">
-    <h1 class="text-2xl font-bold mb-4">
-      My Registrations
-    </h1>
-
+  <PageContainer
+    title="My Registrations"
+    max-width="md"
+  >
     <RegistrationList
       :dates="dates"
       @cancel="onCancel"
     />
-  </div>
+  </PageContainer>
 </template>
 
 <script setup lang="ts">
@@ -20,6 +19,8 @@ import type { CancelRegistrationEvent } from '~/components/Registration/Calendar
 
 const calendarStore = useCalendarStore()
 const { isAuthorized } = useAuthorizationStore()
+
+useAsyncData(() => calendarStore.fetch())
 
 const overlay = useOverlay()
 const confirmCancelModal = overlay.create(ConfirmCancel)

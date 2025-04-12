@@ -1,7 +1,7 @@
 <template>
   <div class="border-solid border-black border-1 rounded-sm bg-white p-4">
     <h1 v-if="isEmpty(registeredDates)">
-      No registrations found. To make a registrations, select a timeslot on the calendar <ULink to="/calendar"> here </ULink>.
+      No registrations found. To make a registrations, select a timeslot on the calendar <ULink to="/sign-up"> here </ULink>.
     </h1>
 
     <div
@@ -25,7 +25,7 @@
               trailing-icon="i-lucide-x"
               class="mt-1 mb-1 flex justify-between hover:bg-red-500 w-[150px]"
               :label="getTimeSlotLabel(time)"
-              @click="cancel(date.id!, date.date, area, time)"
+              @click="cancel(date.id!, date.date, area, time, time.registration!)"
             />
           </div>
         </div>
@@ -39,7 +39,7 @@ import { format } from 'date-fns'
 import { filter, isEmpty, isNil, map, toNumber } from 'lodash-es'
 import type { CancelRegistrationEvent } from './CalendarCell.vue'
 import type { Day } from '~/types/calendar'
-import type { Area, TimeSlot } from '~/types/registration'
+import type { Area, RegistrationID, TimeSlot } from '~/types/registration'
 
 const props = defineProps<{
   dates: Day[]
@@ -49,11 +49,11 @@ const emit = defineEmits<{
   cancel: [event: CancelRegistrationEvent]
 }>()
 
-function cancel(dayID: number, date: Date, { times, ...area }: Area, time: TimeSlot) {
+function cancel(dayID: number, date: Date, { times, ...area }: Area, time: TimeSlot, registration: RegistrationID) {
   emit('cancel', {
-    id: time.registration!,
+    registration,
     dateID: dayID,
-    date,
+    date: date,
     area: {
       ...area,
       time

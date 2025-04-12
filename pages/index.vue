@@ -16,6 +16,7 @@
         class="mb-2 justify-center bg-white"
         variant="outline"
         size="xl"
+        to="/sign-up"
       >
         Sign Up
       </UButton>
@@ -23,6 +24,7 @@
         class="mb-2 justify-center bg-white"
         variant="outline"
         size="xl"
+        to="/registrations"
       >
         My Registrations
       </UButton>
